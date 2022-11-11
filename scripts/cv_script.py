@@ -1,5 +1,6 @@
 
 import cv2
+
 from detect import qrDetect
 
 def main():
