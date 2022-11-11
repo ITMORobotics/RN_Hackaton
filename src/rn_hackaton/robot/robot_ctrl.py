@@ -66,7 +66,7 @@ class RobotControl:
     def __init__(self, gripper_port: str):
         self.__gripper_port = gripper_port
     
-    def toogle_gripper(self, signal = False):
+    def toggle_gripper(self, signal = False):
         set_do(self.__gripper_port, signal)
     
     @property

@@ -6,7 +6,6 @@ import numpy as np
 from PIL import Image
 
 from rn_hackaton.robot.robot_ctrl import RobotControl, MotionCartPose
-# from rn_hackaton.qr_handler.pylon_detector import PylonQRDetector as QRDetector
 
 N = 5
 bias_random_pose = np.array([0.9, 0.0, 0.5])
@@ -18,7 +17,7 @@ def main():
     for i in range(0, N):
         random_pose = bias_random_pose + np.random.uniform(low=-0.2, high =0.2, size = 3)
         motion_cp = MotionCartPose.from_array(random_pose[:3])
-        # robot_ctrl.toogle_gripper(True)
+        # robot_ctrl.toggle_gripper(True)
 
         print(robot_ctrl.pose)
         notify(robot_ctrl.pose.cart_point)
