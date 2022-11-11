@@ -23,7 +23,7 @@ class KernDBControl:
         try:
             cursor = self.__connection.cursor()
             print("Connected to SQLite")
-            sqlite_insert_blob_query = """ INSERT INTO kern_info (id, mass, front_photo, left_photo) VALUES (?, ?, ?, ?)"""
+            sqlite_insert_blob_query = """ INSERT OR REPLACE INTO kern_info (kern_id, mass, front_photo, left_photo) VALUES (?, ?, ?, ?)"""
 
             front_photo_bin = self.convertToBinaryData(photo_front_pil)
             left_photo_bin = self.convertToBinaryData(photo_left_pil)
@@ -40,16 +40,16 @@ class KernDBControl:
 
         return False
     
-    def read_last_analize_data(self, id):
+    def read_last_analize_data(self, kern_id: int):
         try:
             cur = self.__connection.cursor()
-            cur.execute("SELECT * FROM kern_info WHERE id=? ORDER BY id DESC LIMIT 1", (id,))
+            cur.execute("SELECT * FROM kern_info WHERE kern_id=? ORDER BY kern_id DESC LIMIT 1", (kern_id,))
             row = list(cur.fetchone())
             # Convert the bytes into a PIL image
-            print(type(row[3]))
-            pil_front_photo = Image.open(io.BytesIO(row[3]))
-            pil_left_photo = Image.open(io.BytesIO(row[4]))
-            return (row[:3], pil_front_photo, pil_left_photo)
+            print(type(row[2]))
+            pil_front_photo = Image.open(io.BytesIO(row[2]))
+            pil_left_photo = Image.open(io.BytesIO(row[3]))
+            return (row[:2], pil_front_photo, pil_left_photo)
 
         except sqlite3.Error as error:
             print("Failed to read data from table: KERN-INFO", error)

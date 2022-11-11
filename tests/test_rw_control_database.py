@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from rw_control_database import KernDBControl
+from db_control.rw_control_database import KernDBControl
 
 # 7681 - id for kern 1
 KERN_1 = 7681
