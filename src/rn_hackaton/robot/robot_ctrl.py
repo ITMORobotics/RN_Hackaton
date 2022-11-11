@@ -35,6 +35,13 @@ class MotionCartPose:
             np.array((robot_orient.x, robot_orient.y, robot_orient.z))
         )
         return new_motion_cart_pose
+    
+    @staticmethod
+    def from_array(robot_pose: np.ndarray, robot_orient: np.ndarray):
+        new_motion_cart_pose = MotionCartPose()
+        new_motion_cart_pose.cart_point = robot_pose
+        new_motion_cart_pose.cart_orient = robot_orient
+        return new_motion_cart_pose
 
     @property
     def cart_point(self):
@@ -58,7 +65,7 @@ class RobotControl:
     def __init__(self):
         pass
 
-    def move_line(self, cart_point: MotionCartPose, smooth: float, tool_name: str, speed: float = 100, accel: float = 1000.0):
+    def move_line(self, cart_point: MotionCartPose, tool_name: str = "Flange", smooth: float = 0.0, speed: float = 100, accel: float = 1000.0):
         line(
             cart_point.to_robot_type(),
             speed, 
