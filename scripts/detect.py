@@ -21,6 +21,11 @@ def main():
             detect_result = qr_detect(gray_frame)
             if len(detect_result) > 0:
                 for dec in detect_result:
+                    qr_center = (   int(dec.rect.left + dec.rect.width/2),
+                                    int(dec.rect.top + dec.rect.height/2)
+                                )
+                    print(qr_center)
+                    frame = cv2.circle(frame, qr_center,radius=2,color = (100,200,75), thickness = 10)
                     out_frame = cv2.polylines(frame,np.array([dec.polygon],np.int32),True, (255,255,255),4)
                     print("Core id: ",dec.data.decode('UTF-8'))
             else:
