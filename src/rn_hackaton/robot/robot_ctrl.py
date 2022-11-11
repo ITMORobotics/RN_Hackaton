@@ -2,24 +2,25 @@ import math
 import numpy as np
 
 class MotionCartPose:
-    def ___init__(self):
-        self.__cart_point: np.ndarray = None
-        self.__cart_orient: np.ndarray = None
-        self.__is_initialized = True
+    def __init__(self):
+        self.__cart_point = None
+        self.__cart_orient = None
+        self.__is_initialized = False
     
     def to_robot_type(self):
         assert self.__is_initialized, "Pose is not initialized"
         new_cart_pose = get_cartesian_position()
-        new_cart_pose.x = self.__cart_point[0]*1000.0
-        new_cart_pose.y = self.__cart_point[1]*1000.0
-        new_cart_pose.z = self.__cart_point[2]*1000.0
+        new_cart_pose.x = self.__cart_point[0]*1e3
+        new_cart_pose.y = self.__cart_point[1]*1e3
+        new_cart_pose.z = self.__cart_point[2]*1e3
 
         cp_orient = new_cart_pose.get_rotation()
-        deg_orient = np.radians(self.__cart_orient)
         if not self.__cart_orient is None:
+            deg_orient = np.degrees(self.__cart_orient)
             cp_orient.x = deg_orient[0]
             cp_orient.y = deg_orient[1]
             cp_orient.z = deg_orient[2]
+        
         new_cart_pose.set_rotation(cp_orient)
 
         return new_cart_pose
@@ -31,13 +32,13 @@ class MotionCartPose:
             (robot_pose.x, robot_pose.y, robot_pose.z)
         )*1e-3
         robot_orient = robot_pose.get_rotation()
-        new_motion_cart_pose.cart_orient = np.degrees(
+        new_motion_cart_pose.cart_orient = np.radians(
             np.array((robot_orient.x, robot_orient.y, robot_orient.z))
         )
         return new_motion_cart_pose
     
     @staticmethod
-    def from_array(robot_pose: np.ndarray, robot_orient: np.ndarray):
+    def from_array(robot_pose: np.ndarray, robot_orient: np.ndarray = None):
         new_motion_cart_pose = MotionCartPose()
         new_motion_cart_pose.cart_point = robot_pose
         new_motion_cart_pose.cart_orient = robot_orient
@@ -62,21 +63,12 @@ class MotionCartPose:
     
 
 class RobotControl:
-    def __init__(self):
-        pass
-
-    def move_line(self, cart_point: MotionCartPose, tool_name: str = "Flange", smooth: float = 0.0, speed: float = 100, accel: float = 1000.0):
-        line(
-            cart_point.to_robot_type(),
-            speed, 
-            accel,
-            smooth,
-            self.__tool_config[tool_name]
-        )
+    def __init__(self, gripper_port: str):
+        self.__gripper_port = gripper_port
+    
+    def toogle_gripper(self, signal = False):
+        set_do(self.__gripper_port, signal)
     
     @property
     def pose(self):
-        return from_robot_type(get_cartesian_position())
-    
-    def move_joint(self):
-        pass
+        return MotionCartPose.from_robot_type(get_cartesian_position())
