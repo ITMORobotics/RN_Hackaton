@@ -4,10 +4,9 @@ import time
 import cv2
 import numpy as np
 from PIL import Image
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from qr_handler.simple_cam_detector import SimpleQRDetector as QRDetector
-# from qr_handler.pylon_detector import PylonQRDetector as QRDetector
+from rn_hackaton.qr_handler.simple_cam_detector import SimpleQRDetector as QRDetector
+# from rn_hackaton.qr_handler.pylon_detector import PylonQRDetector as QRDetector
 
 def main():
     qr_detector = QRDetector()

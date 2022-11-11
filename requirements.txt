@@ -1,2 +1,6 @@
 opencv-python
 pillow
+pyzbar
+pypylon
+numpy
+pysqlite3
