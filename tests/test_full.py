@@ -25,7 +25,7 @@ PHOTO_ORIENT = np.radians(np.array((-90.0, 0.0, 0.0)))
 DEFAULT_ORIENT = np.array((np.pi, 0.0, 0.0))
 
 class CartPTPCommand(Command):
-    def __init__(self, func_pointer, cart_position: MotionCartPose, speed = 100, accel = 1000, smooth = 0.0):
+    def __init__(self, func_pointer, cart_position: MotionCartPose, speed = 200, accel = 1500, smooth = 0.0):
         self.__func = func_pointer
 
         self.__cart_position  = cart_position
@@ -93,9 +93,10 @@ def stage_3_put_container_on_scale(cell: Cell):
     MOVE_CONTAINER_WITH_KERN = [
         OPEN_GRIPPER,
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')), # under catch container
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.362)), CATCH_ORIENT, tool_name = 'ggrip')), # step1 container left up
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step2_container left down
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.5, 0.54428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container take up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.362)), CATCH_ORIENT, tool_name = 'ggrip')), # step1 container in up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step2_container in down
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step3_container left down
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container left_up
     ]
     execute_commands(MOVE_CONTAINER_WITH_KERN)
 
@@ -116,10 +117,10 @@ def stage_5_make_photo(cell: Cell, qr_detector: QRDetector):
     img_front = qr_detector.get_bgr_image()
     execute_commands([TO_TOREC,])
     img_left = qr_detector.get_bgr_image()
-    
+    execute_commands([TO_UNDER,])
     cell.save_front_photo(img_front)
     cell.save_left_photo(img_left)
-
+    cell.save_in_db()
 
 def main():
     cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
