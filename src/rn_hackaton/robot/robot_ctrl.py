@@ -28,8 +28,8 @@ class MotionCartPose:
         return new_cart_pose
     
     @staticmethod
-    def from_robot_type(robot_pose):
-        new_motion_cart_pose = MotionCartPose()
+    def from_robot_type(robot_pose, tool_name: str = 'Flange'):
+        new_motion_cart_pose = MotionCartPose(tool_name)
         new_motion_cart_pose.cart_point = np.array(
             (robot_pose.x, robot_pose.y, robot_pose.z)
         )*1e-3
@@ -40,8 +40,8 @@ class MotionCartPose:
         return new_motion_cart_pose
     
     @staticmethod
-    def from_array(robot_pose: np.ndarray, robot_orient: np.ndarray = None):
-        new_motion_cart_pose = MotionCartPose()
+    def from_array(robot_pose: np.ndarray, robot_orient: np.ndarray = None, tool_name: str = 'Flange'):
+        new_motion_cart_pose = MotionCartPose(tool_name= tool_name)
         new_motion_cart_pose.cart_point = robot_pose
         new_motion_cart_pose.cart_orient = robot_orient
         return new_motion_cart_pose
@@ -85,14 +85,3 @@ class GripperCommand(Command):
 
     def command_func(self):
        self.__func(self.__signal_name, self.__cmd)
-
-class RobotControl:
-    def __init__(self, gripper_port: str):
-        self.__gripper_port = gripper_port
-    
-    def toggle_gripper(self, signal = False):
-        set_do(self.__gripper_port, signal)
-    
-    @property
-    def pose(self):
-        return MotionCartPose.from_robot_type(get_cartesian_position())
