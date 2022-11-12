@@ -41,12 +41,13 @@ def main():
     ser = SerialReader()
     try:
         ser.start_thread()
+        time.sleep(1)
         while True:
             print('-'*50)
             print('time:  ', ser.scale_time_update)
             print("scale: ", ser.scale)
             print("ir   : ", ser.IRS)
-            time.sleep(1)
+            time.sleep(0.1)
     except KeyboardInterrupt:
         ser.stop_thread()
 

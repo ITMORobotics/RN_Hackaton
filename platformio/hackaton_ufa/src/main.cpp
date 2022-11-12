@@ -29,11 +29,12 @@ void setup() {
   // MyScale.setCalibration(1852);
   pinMode(IRS_1_PIN, INPUT); // IR Sensor pin INPUT
   pinMode(IRS_2_PIN, INPUT); // IR Sensor pin INPUT
+  delay(500);
   for(int i = 0; i < filt_N; i++)
   {
     update(MyScale.getValue());
   }
-  offset = filt_scale;
+  offset = filt_scale*scale;
 }
 
 void loop() {
