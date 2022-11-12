@@ -41,6 +41,7 @@ class Stelazh:
 
 class Cell:
     def __init__(self,  db_path: str, serial_port: str, calibrate_points: list):
+        
         self.__db_ctrl = KernDBControl(db_path)
         self.__serial = SerialReader(serial_port)
         self.__stelazh = Stelazh()

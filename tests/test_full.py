@@ -14,8 +14,8 @@ from rn_hackaton.qr_handler.simple_cam_detector import SimpleQRDetector as QRDet
 
 KERN_ID = 7681
 CALIBRATE_STELAZH = (
-    np.array((0.66653, 0.20485, 0.54356)),
-    np.array((0.89301, 0.19039, 0.54397))
+    np.array((0.66653, 0.20485, 0.53256)),
+    np.array((0.89301, 0.19039, 0.53297))
 )
 OPEN_GRIPPER = GripperCommand("Signal", False)
 CLOSE_GRIPPER = GripperCommand("Signal", True)
@@ -93,30 +93,29 @@ def stage_2_get_container_from_stelazh(container_pose: np.ndarray):
 def stage_3_perform_kern():
     execute_commands(GET_CONTAINER_FROM_STELAGE)
 
-def stage_4_get_container_with_kern():
+def stage_4_put_container_on_scale():
     MOVE_CONTAINER_WITH_KERN = [
         OPEN_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.486, 0.622)), DEFAULT_ORIENT, tool_name = 'ggrip')), # under catch container
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.486, 0.422)), DEFAULT_ORIENT, tool_name = 'ggrip')), # step1 container left up
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.45673, 0.422)), DEFAULT_ORIENT, tool_name = 'ggrip')), # step2_container left down
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.7518, -0.479, 0.49691)), CATCH_ORIENT, tool_name = 'ggrip')), # step3_container in down
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.6680, -0.46, 0.5573)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container take up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')), # under catch container
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.362)), CATCH_ORIENT, tool_name = 'ggrip')), # step1 container left up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step2_container left down
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.5, 0.54428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container take up
     ]
     execute_commands(MOVE_CONTAINER_WITH_KERN)
 
 
 
 def main():
-    cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
-    index = cell.get_index(KERN_ID)
-    notify(index)
-    # container_pose = cell.stelazh[index[0], index[1]]
+    #cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
+    #index = cell.get_index(KERN_ID)
+    #notify(index)
+    #container_pose = cell.stelazh[index[0], index[1]]
 
     # notify(container_pose)
-    # # stage_1_move_to_qr(container_pose)
+    # # stage_1_move_to_qr()
     
-    # # stage_2_get_container_from_stelazh(container_pose)
-    # stage_3_perform_kern()
+    # stage_2_get_container_from_stelazh(CALIBRATE_STELAZH[0])
+    stage_4_put_container_on_scale()
 
 
 if __name__ == "__main__":

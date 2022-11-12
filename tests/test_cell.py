@@ -1,4 +1,5 @@
 import time
+import os
 import numpy as np
 from rn_hackaton.cell.lab import Cell
 from rn_hackaton.qr_handler.simple_cam_detector import SimpleQRDetector as QRDetector
@@ -9,7 +10,7 @@ CALIBRATE_STELAZH = (
     np.array((0.89301, 0.19039, 0.54397))
 )
 def main():
-    cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
+    cell = Cell('hackt.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
     qr_detector = QRDetector()
     cell.save_id(5555)
     cell.save_mass()
@@ -17,6 +18,7 @@ def main():
     cell.save_front_photo(qr_detector.get_bgr_image())
     cell.save_in_db()
     notify(KERN_ID)
+    
     print(cell.get_index(KERN_ID))
 if __name__ == "__main__":
     main()

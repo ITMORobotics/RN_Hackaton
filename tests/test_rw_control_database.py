@@ -35,7 +35,20 @@ class testUtils(unittest.TestCase):
 
     
 def main():
-    unittest.main(exit=False)
+    __db_ctrl = KernDBControl('hackt.db')
+
+    data = __db_ctrl.read_kern_table_by_id(KERN_1)
+    print(data)
+
+    image_1 = Image.open('kern.png')
+    ok = __db_ctrl.insert_analyze_data(KERN_1, 0.55, image_1, image_1)
+    check_data = __db_ctrl.read_last_analize_data(KERN_1)
+    print(check_data)
+
+    res_imgref = np.asarray(image_1)
+    res_img_test = np.asarray(check_data[2])
+    # Calculate the absolute difference on each channel separately
+    diff = np.sum(np.fabs(np.subtract(res_imgref[:, :], res_img_test[:, :])))
 
 if __name__ == "__main__":
     main()
