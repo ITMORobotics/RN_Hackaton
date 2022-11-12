@@ -1,9 +1,8 @@
 import os
 import sys
 import time
-import cv2
 import numpy as np
-from PIL import Image
+import copy
 
 from rn_hackaton.robot.robot_ctrl import Command, MotionCartPose, GripperCommand
 from rn_hackaton.cell.lab import Cell
@@ -89,20 +88,16 @@ def stage_2_get_container_from_stelazh(container_pose: np.ndarray):
     ]
     execute_commands(GET_CONTAINER_FROM_STELAGE)
 
-def stage_3_put_container_on_scale(cell: Cell):
+def stage_3_put_container_on_scale():
     print("Stage 3")
-    MOVE_CONTAINER_WITH_KERN = [
+    MOVE_CONTAINER_WITHOUT_KERN = [
         OPEN_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')), # under catch container
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.362)), CATCH_ORIENT, tool_name = 'ggrip')), # step1 container in up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')), # step1 container in up
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step2_container in down
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step3_container left down
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container left_up
     ]
-    execute_commands(MOVE_CONTAINER_WITH_KERN)
-
-    # cell.save_mass()
-    cell.save_id(KERN_ID)
+    execute_commands(MOVE_CONTAINER_WITHOUT_KERN)
 
 def stage_4_put_kern_on_scale():
     print("Stage 4")
@@ -121,13 +116,19 @@ def stage_5_make_photo(cell: Cell, qr_detector: QRDetector):
     execute_commands([TO_UNDER,])
     cell.save_front_photo(img_front)
     cell.save_left_photo(img_left)
+    # cell.save_mass()
+    cell.save_id(KERN_ID)
     cell.save_in_db()
 
-def stage_6_get_container_from_scale():
-    pass
+def stage_6_get_container_from_scale(stage_3_pattern: list):
+    print("Stage 6")
+    MOVE_CONTAINER_WITH_KERN = copy.copy(stage_3_pattern.reverse())
+    execute_commands(MOVE_CONTAINER_WITH_KERN)
 
-def stage_7_put_container_in_strelazh():
-    pass
+def stage_7_put_container_in_stelazh(stage_2_pattern: list):
+    print("Stage 7")
+    PUT_CONTAINER_IN_STELAZH = copy.copy(stage_2_pattern.reverse())
+    execute_commands(PUT_CONTAINER_IN_STELAZH)
 
 def main():
     cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
