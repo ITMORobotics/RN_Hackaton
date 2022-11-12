@@ -26,7 +26,7 @@ DEFAULT_ORIENT = np.array((np.pi, 0.0, 0.0))
 LEFT_KERN_PLACE = np.array([0.59050,-0.24279, 0.38833])
 RIGTH_KERN_PLACE = np.array([0.59050,-0.2891, 0.38797])
 
-KERN_PLACE = None
+KERN_PLACE = LEFT_KERN_PLACE
 
 class CartPTPCommand(Command):
     def __init__(self, func_pointer, cart_position: MotionCartPose, speed = 200, accel = 1500, smooth = 0.0):
@@ -51,9 +51,28 @@ def execute_commands(cmd_list: list):
     for c in cmd_list:
         c.execute()
 
+def performe_container_in_stelazh(container_pose: np.ndarray):
+    return [
+        OPEN_GRIPPER,
+        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.06 ,0.0)), CATCH_ORIENT, tool_name = 'ggrip')), # before catch container
+        CartPTPCommand(line, MotionCartPose.from_array(container_pose , CATCH_ORIENT, tool_name = 'ggrip')), # under catch container
+        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, 0.0,0.013)), CATCH_ORIENT, tool_name = 'ggrip')), # in catch container
+        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.20, 0.013)), CATCH_ORIENT, tool_name = 'ggrip')), # get catch container
+        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.20, 0.1)), CATCH_ORIENT, tool_name = 'ggrip')) # take up catch container
+    ]
+
+def performe_container_on_scale():
+    return [
+        OPEN_GRIPPER,
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')), # step1 container in up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step2_container in down
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step3_container left down
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container left_up
+    ]
 def stage_1_move_to_qr(cell: Cell, qr_detector: QRDetector):
     print("Stage 1")
     global KERN_ID
+    global KERN_PLACE
 
     MOVE_TO_LEFT_QR = CartPTPCommand(line, MotionCartPose.from_array(LEFT_KERN_PLACE, DEFAULT_ORIENT, tool_name = 'ggcam'))
     MOVE_TO_RIGTH_QR = CartPTPCommand(line, MotionCartPose.from_array(RIGTH_KERN_PLACE, DEFAULT_ORIENT, tool_name = 'ggcam'))
@@ -62,7 +81,8 @@ def stage_1_move_to_qr(cell: Cell, qr_detector: QRDetector):
     
     while True:
         if cell.busy_kern_index is None:
-                    continue
+            time.sleep(0.1)
+            continue
 
         if cell.busy_kern_index == 0:
             KERN_PLACE = RIGTH_KERN_PLACE
@@ -85,28 +105,14 @@ def stage_1_move_to_qr(cell: Cell, qr_detector: QRDetector):
 
 def stage_2_get_container_from_stelazh(container_pose: np.ndarray):
     print("Stage 2")
-    GET_CONTAINER_FROM_STELAGE = [
-        OPEN_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.06 ,0.0)), CATCH_ORIENT, tool_name = 'ggrip')), # before catch container
-        CartPTPCommand(line, MotionCartPose.from_array(container_pose , CATCH_ORIENT, tool_name = 'ggrip')), # under catch container
-        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, 0.0,0.013)), CATCH_ORIENT, tool_name = 'ggrip')), # in catch container
-        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.20, 0.013)), CATCH_ORIENT, tool_name = 'ggrip')), # get catch container
-        CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.20, 0.1)), CATCH_ORIENT, tool_name = 'ggrip')), # take up catch container
-    ]
+    GET_CONTAINER_FROM_STELAGE = performe_container_in_stelazh(container_pose)
     execute_commands(GET_CONTAINER_FROM_STELAGE)
-    return copy.copy(GET_CONTAINER_FROM_STELAGE)
+    return GET_CONTAINER_FROM_STELAGE
 
 def stage_3_put_container_on_scale():
     print("Stage 3")
-    MOVE_CONTAINER_WITHOUT_KERN = [
-        OPEN_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')), # step1 container in up
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step2_container in down
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.382)), CATCH_ORIENT, tool_name = 'ggrip')), # step3_container left down
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container left_up
-    ]
+    MOVE_CONTAINER_WITHOUT_KERN = performe_container_on_scale()
     execute_commands(MOVE_CONTAINER_WITHOUT_KERN)
-    return copy.copy(MOVE_CONTAINER_WITHOUT_KERN)
 
 def stage_4_put_kern_on_scale():
     print("Stage 4")
@@ -121,7 +127,7 @@ def stage_4_put_kern_on_scale():
         CLOSE_GRIPPER,
         CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go up
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go to scale
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428) + np.array((0.0, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go down to put it
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)) + np.array((0.0, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go down to put it
         OPEN_GRIPPER,
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), DEFAULT_ORIENT, tool_name = 'ggrip')), # finish stage 4
     ] 
@@ -143,14 +149,14 @@ def stage_5_make_photo(cell: Cell, qr_detector: QRDetector):
     cell.save_id(KERN_ID)
     cell.save_in_db()
 
-def stage_6_get_container_from_scale(stage_3_pattern: list):
+def stage_6_get_container_from_scale():
     print("Stage 6")
-    MOVE_CONTAINER_WITH_KERN = copy.copy(stage_3_pattern.reverse())
+    MOVE_CONTAINER_WITH_KERN = performe_container_on_scale()[::-1]
     execute_commands(MOVE_CONTAINER_WITH_KERN)
 
-def stage_7_put_container_in_stelazh(stage_2_pattern: list):
+def stage_7_put_container_in_stelazh(container_pose: np.ndarray):
     print("Stage 7")
-    PUT_CONTAINER_IN_STELAZH = copy.copy(stage_2_pattern.reverse())
+    PUT_CONTAINER_IN_STELAZH = performe_container_in_stelazh(container_pose)[::-1]
     execute_commands(PUT_CONTAINER_IN_STELAZH)
 
 def main():
@@ -163,12 +169,12 @@ def main():
     print("Container pose", container_pose)
     # stage_1_move_to_qr()
     
-    stage_2_pattern = stage_2_get_container_from_stelazh(container_pose)
-    stage_3_pattern = stage_3_put_container_on_scale()
+    stage_2_get_container_from_stelazh(container_pose)
+    stage_3_put_container_on_scale()
     stage_4_put_kern_on_scale()
     stage_5_make_photo(cell, qr_detector)
-    stage_6_get_container_from_scale(stage_3_pattern)
-    stage_7_put_container_in_stelazh(stage_2_pattern)
+    stage_6_get_container_from_scale()
+    stage_7_put_container_in_stelazh(container_pose)
 
 
 if __name__ == "__main__":
