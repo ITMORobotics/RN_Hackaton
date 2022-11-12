@@ -12,6 +12,14 @@ class SerialReader:
         self._thread_alive = True
         self.update_thread = threading.Thread(target=self.update)
     
+    def get_IRS(self, index = None):
+        if index is None:
+            return self.IRS
+        return self.IRS[index]
+
+    def get_scale(self):
+        return self.scale  
+
     def start_thread(self):
         self._thread_alive = True
         self.update_thread.start()
