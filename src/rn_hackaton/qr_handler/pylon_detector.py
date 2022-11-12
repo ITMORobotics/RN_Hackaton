@@ -1,5 +1,5 @@
 from pypylon import pylon
-from qr_detector import QRDetector
+from .qr_detector import QRDetector
 from PIL import Image
 
 class PylonQRDetector(QRDetector):

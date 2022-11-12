@@ -36,7 +36,7 @@ class Stelazh:
 
     def calibrate(self,point_left_up: np.ndarray, point_rigth_up: np.ndarray):
         temp = point_left_up - point_rigth_up
-        self.phi = np.atan2(temp[0],temp[1])
+        self.phi = np.arctan2(temp[0],temp[1])
 
 
 class Cell:
@@ -44,7 +44,7 @@ class Cell:
         self.__db_ctrl = KernDBControl(db_path)
         self.__serial = SerialReader(serial_port)
         self.__stelazh = Stelazh()
-        self.__stelazh.calibrate(calibrate_points)
+        self.__stelazh.calibrate(*calibrate_points)
         self.__data_row = [7681, -1, 0, 0]
     
     def save_id(self, id: int):
@@ -62,6 +62,11 @@ class Cell:
 
     def save_in_db(self):
         self.__db_ctrl.insert_analyze_data(*self.__data_row)
+    
+    def get_index(self, kern_id: int):
+        check_data = self.__db_ctrl.read_kern_table_by_id(kern_id)
+        print(check_data)
+        return (check_data[7], check_data[8])
 
     @property
     def stelazh(self) -> Stelazh:

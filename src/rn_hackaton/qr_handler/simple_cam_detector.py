@@ -16,7 +16,7 @@ class SimpleQRDetector(QRDetector):
     def get_bgr_image(self) -> Image:
         ret, frame = self.__camera.read()
         if ret:
-            return Image.fromarray(frame[:,:,:,-1])
+            return Image.fromarray(frame[:,:,::-1])
 
     def __del__(self): 
         self.__camera.release()
