@@ -119,13 +119,13 @@ def stage_4_put_kern_on_scale():
 
     PUT_KERN_ON_SCALE = [
         CLOSE_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((-0.05, 0.0 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # under kern
-        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((-0.05, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # step down before kern
-        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # push kern
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # under kern
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # step down before kern
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((-0.05, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # push kern
         OPEN_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,-0.13)), DEFAULT_ORIENT, tool_name = 'ggrip')), # take kern
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((-0.05, 0.0 ,-0.13)), DEFAULT_ORIENT, tool_name = 'ggrip')), # take kern
         CLOSE_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go up
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((-0.05, 0.0 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go up
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go to scale
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)) + np.array((0.0, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go down to put it
         OPEN_GRIPPER,
