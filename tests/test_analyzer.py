@@ -3,7 +3,7 @@ import time
 from rn_hackaton.stend.analyzer import SerialReader
 
 def main():
-    ser = SerialReader()
+    ser = SerialReader('COM4')
     try:
         ser.start_thread()
         time.sleep(1)

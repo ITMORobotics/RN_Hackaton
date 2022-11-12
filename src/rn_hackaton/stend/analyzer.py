@@ -4,13 +4,18 @@ import serial
 import threading
 
 class SerialReader:
-    def __init__(self):
+    def __init__(self, serial_port: str):
+        self.__serial_port = serial_port
         self.IRS = [None, None]
         self.irs_time_update = [-1, -1]
         self.scale = None
         self.scale_time_update = -1
         self._thread_alive = True
         self.update_thread = threading.Thread(target=self.update)
+        self.update_thread.setDaemon(True)
+        self.start_thread()
+        # Should sleep
+
     
     def get_IRS(self, index = None):
         if index is None:
@@ -18,6 +23,8 @@ class SerialReader:
         return self.IRS[index]
 
     def get_scale(self):
+        while self.scale is None:
+            time.sleep(0.1)
         return self.scale  
 
     def start_thread(self):
@@ -29,7 +36,7 @@ class SerialReader:
         self.update_thread.join()
 
     def update(self):
-        with serial.Serial('/dev/ttyUSB0', 9600, timeout=1) as ser:
+        with serial.Serial(self.__serial_port, 9600, timeout=1) as ser:
             while self._thread_alive:
                 line = ser.readline().decode('UTF-8')
                 if line != "":
