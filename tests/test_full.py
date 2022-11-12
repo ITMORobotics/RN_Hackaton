@@ -21,6 +21,7 @@ OPEN_GRIPPER = GripperCommand("Signal", False)
 CLOSE_GRIPPER = GripperCommand("Signal", True)
 
 CATCH_ORIENT = np.radians(np.array((156.8, 0.0, 0.0)))
+PHOTO_ORIENT = np.radians(np.array((90.0, 0.0, 0.0)))
 DEFAULT_ORIENT = np.array((np.pi, 0.0, 0.0))
 
 class CartPTPCommand(Command):
@@ -46,7 +47,7 @@ def execute_commands(cmd_list: list):
     for c in cmd_list:
         c.execute()
 
-def stage_1_move_to_qr():
+def stage_1_move_to_qr(cell: Cell,):
     global KERN_ID
     LEFT_KERN_PLACE = np.array([0.59050,-0.24279, 0.38833])
     RIGTH_KERN_PLACE = np.array([0.59050,-0.2891, 0.38797])
@@ -58,8 +59,6 @@ def stage_1_move_to_qr():
     TAKE_LEFT_QR    = CartPTPCommand(line, MotionCartPose.from_array(LEFT_KERN_PLACE[:3]- np.array([0,0,0.010]), LEFT_KERN_PLACE[3:], tool_name = 'ggrip'))
     TAKE_RIGTH_QR = CartPTPCommand(line, MotionCartPose.from_array(RIGTH_KERN_PLACE[:3] - np.array([0,0,0.010]), RIGTH_KERN_PLACE[3:], tool_name = 'ggrip'))
 
-    execute_commands([OPEN_GRIPPER, MOVE_TO_CHECK_QR])
-
     qr_detector = QRDetector()
     start_time = time.time()
     while (time.time() - start_time) < 5.0:
@@ -70,12 +69,13 @@ def stage_1_move_to_qr():
             for i in range(detect.N):
                 det = detect[i]
                 KERN_ID = det.info
-                if det.center[1] > 640/2:
-                    # rigth
-                    execute_commands([MOVE_TO_RIGTH_QR, TAKE_RIGTH_QR,CLOSE_GRIPPER, MOVE_TO_RIGTH_QR])
-                else:
-                    # left 
-                    execute_commands([MOVE_TO_LEFT_QR, TAKE_LEFT_QR,CLOSE_GRIPPER, MOVE_TO_LEFT_QR])
+                if cell.busy_kern_index is None:
+                    continue
+
+                if cell.busy_kern_index == 0:
+                    execute_commands([OPEN_GRIPPER, MOVE_TO_RIGTH_QR, TAKE_RIGTH_QR,CLOSE_GRIPPER, MOVE_TO_RIGTH_QR])
+                else: 
+                    execute_commands([OPEN_GRIPPER, MOVE_TO_LEFT_QR, TAKE_LEFT_QR,CLOSE_GRIPPER, MOVE_TO_LEFT_QR])
 
 def stage_2_get_container_from_stelazh(container_pose: np.ndarray):
     GET_CONTAINER_FROM_STELAGE = [
@@ -84,16 +84,10 @@ def stage_2_get_container_from_stelazh(container_pose: np.ndarray):
         CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, 0.0,0.013)), CATCH_ORIENT, tool_name = 'ggrip')), # in catch container
         CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.20, 0.013)), CATCH_ORIENT, tool_name = 'ggrip')), # get catch container
         CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.20, 0.1)), CATCH_ORIENT, tool_name = 'ggrip')), # take up catch container
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.7518, -0.479, 0.55691)), CATCH_ORIENT, tool_name = 'ggrip')), # take container under vesi
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.7518, -0.479, 0.49691)), CATCH_ORIENT, tool_name = 'ggrip')), # take up catch container
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.7518, -0.479, 0.55691)), CATCH_ORIENT, tool_name = 'ggrip')), # take container under vesi
     ]
     execute_commands(GET_CONTAINER_FROM_STELAGE)
 
-def stage_3_perform_kern():
-    execute_commands(GET_CONTAINER_FROM_STELAGE)
-
-def stage_4_put_container_on_scale():
+def stage_3_put_container_on_scale():
     MOVE_CONTAINER_WITH_KERN = [
         OPEN_GRIPPER,
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')), # under catch container
@@ -102,6 +96,15 @@ def stage_4_put_container_on_scale():
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.5, 0.54428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container take up
     ]
     execute_commands(MOVE_CONTAINER_WITH_KERN)
+
+def stage_4_put_kern_on_scale():
+    pass
+    # execute_commands(PUT_KERN_ON_SCALE)
+
+def stage_5_make_photo(qr_detector):
+    TO_TOREC = CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), PHOTO_ORIENT, tool_name = 'ggrip')), # under catch container
+    execute_commands(TO_TOREC)
+
 
 
 
@@ -115,7 +118,10 @@ def main():
     # # stage_1_move_to_qr()
     
     # stage_2_get_container_from_stelazh(CALIBRATE_STELAZH[0])
-    stage_4_put_container_on_scale()
+
+    stage_4_put_kern_on_scale()
+
+    QRDetector
 
 
 if __name__ == "__main__":
