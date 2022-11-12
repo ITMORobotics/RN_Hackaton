@@ -1,11 +1,13 @@
 import math
 import numpy as np
+from abc import ABC, abstractmethod
 
 class MotionCartPose:
-    def __init__(self):
+    def __init__(self, tool_name: str = 'Flange'):
         self.__cart_point = None
         self.__cart_orient = None
         self.__is_initialized = False
+        self.__tool_name = tool_name
     
     def to_robot_type(self):
         assert self.__is_initialized, "Pose is not initialized"
@@ -52,6 +54,10 @@ class MotionCartPose:
     def cart_orient(self):
         return self.__cart_orient
 
+    @property
+    def tool_name(self):
+        return self.__tool_name
+
     @cart_point.setter
     def cart_point(self, cart_point: np.array):
         self.__cart_point = cart_point
@@ -60,7 +66,25 @@ class MotionCartPose:
     @cart_orient.setter
     def cart_orient(self, cart_oriet: np.array):
         self.__cart_orient = cart_oriet
+
+class Command(ABC):
     
+    @abstractmethod
+    def command_func(self):
+        pass
+    
+    def execute(self):
+        self.command_func()
+
+class GripperCommand(Command):
+    def __init__(self, signal_name: str, cmd = False):
+        self.__cmd = cmd
+        self.__signal_name = signal_name
+        self.__func = set_do
+        Command.__init__(self)
+
+    def command_func(self):
+       self.__func(self.__signal_name, self.__cmd)
 
 class RobotControl:
     def __init__(self, gripper_port: str):
