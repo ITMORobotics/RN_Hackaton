@@ -26,6 +26,8 @@ DEFAULT_ORIENT = np.array((np.pi, 0.0, 0.0))
 LEFT_KERN_PLACE = np.array([0.59050,-0.24279, 0.38833])
 RIGTH_KERN_PLACE = np.array([0.59050,-0.2891, 0.38797])
 
+KERN_PLACE = None
+
 class CartPTPCommand(Command):
     def __init__(self, func_pointer, cart_position: MotionCartPose, speed = 200, accel = 1500, smooth = 0.0):
         self.__func = func_pointer
@@ -53,27 +55,32 @@ def stage_1_move_to_qr(cell: Cell, qr_detector: QRDetector):
     print("Stage 1")
     global KERN_ID
 
-    MOVE_TO_LEFT_QR = CartPTPCommand(line, MotionCartPose.from_array(LEFT_KERN_PLACE[:3], LEFT_KERN_PLACE[3:], tool_name = 'ggrip'))
-    MOVE_TO_RIGTH_QR = CartPTPCommand(line, MotionCartPose.from_array(RIGTH_KERN_PLACE[:3], RIGTH_KERN_PLACE[3:], tool_name = 'ggrip'))
-    TAKE_LEFT_QR    = CartPTPCommand(line, MotionCartPose.from_array(LEFT_KERN_PLACE[:3]- np.array([0,0,0.010]), LEFT_KERN_PLACE[3:], tool_name = 'ggrip'))
-    TAKE_RIGTH_QR = CartPTPCommand(line, MotionCartPose.from_array(RIGTH_KERN_PLACE[:3] - np.array([0,0,0.010]), RIGTH_KERN_PLACE[3:], tool_name = 'ggrip'))
+    MOVE_TO_LEFT_QR = CartPTPCommand(line, MotionCartPose.from_array(LEFT_KERN_PLACE, DEFAULT_ORIENT, tool_name = 'ggcam'))
+    MOVE_TO_RIGTH_QR = CartPTPCommand(line, MotionCartPose.from_array(RIGTH_KERN_PLACE, DEFAULT_ORIENT, tool_name = 'ggcam'))
 
     start_time = time.time()
+    
+    while True:
+        if cell.busy_kern_index is None:
+                    continue
+
+        if cell.busy_kern_index == 0:
+            KERN_PLACE = RIGTH_KERN_PLACE
+            execute_commands([MOVE_TO_RIGTH_QR])
+        else: 
+            KERN_PLACE = LEFT_KERN_PLACE
+            execute_commands([MOVE_TO_LEFT_QR])
+        break
+
     while (time.time() - start_time) < 5.0:
-        detect = qr_detector.detector
+        detect = qr_detector.detector    
         if detect is None:
             continue
         if detect.isDetect:
             for i in range(detect.N):
                 det = detect[i]
                 KERN_ID = det.info
-                if cell.busy_kern_index is None:
-                    continue
-
-                if cell.busy_kern_index == 0:
-                    execute_commands([OPEN_GRIPPER, MOVE_TO_RIGTH_QR, TAKE_RIGTH_QR,CLOSE_GRIPPER, MOVE_TO_RIGTH_QR])
-                else: 
-                    execute_commands([OPEN_GRIPPER, MOVE_TO_LEFT_QR, TAKE_LEFT_QR,CLOSE_GRIPPER, MOVE_TO_LEFT_QR])
+            
 
 
 def stage_2_get_container_from_stelazh(container_pose: np.ndarray):
@@ -103,8 +110,22 @@ def stage_3_put_container_on_scale():
 
 def stage_4_put_kern_on_scale():
     print("Stage 4")
-    pass
-    # execute_commands(PUT_KERN_ON_SCALE)
+
+    PUT_KERN_ON_SCALE = [
+        CLOSE_GRIPPER,
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((-0.05, 0.0 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # under kern
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((-0.05, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # step down before kern
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # push kern
+        OPEN_GRIPPER,
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,-0.13)), DEFAULT_ORIENT, tool_name = 'ggrip')), # take kern
+        CLOSE_GRIPPER,
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.05, 0.0 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go to scale
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428) + np.array((0.0, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go down to put it
+        OPEN_GRIPPER,
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), DEFAULT_ORIENT, tool_name = 'ggrip')), # finish stage 4
+    ] 
+    execute_commands(PUT_KERN_ON_SCALE)
 
 def stage_5_make_photo(cell: Cell, qr_detector: QRDetector):
     print("Stage 5")
