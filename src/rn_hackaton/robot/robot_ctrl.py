@@ -1,11 +1,13 @@
 import math
 import numpy as np
+from abc import ABC, abstractmethod
 
 class MotionCartPose:
-    def __init__(self):
+    def __init__(self, tool_name: str = 'Flange'):
         self.__cart_point = None
         self.__cart_orient = None
         self.__is_initialized = False
+        self.__tool_name = tool_name
     
     def to_robot_type(self):
         assert self.__is_initialized, "Pose is not initialized"
@@ -26,8 +28,8 @@ class MotionCartPose:
         return new_cart_pose
     
     @staticmethod
-    def from_robot_type(robot_pose):
-        new_motion_cart_pose = MotionCartPose()
+    def from_robot_type(robot_pose, tool_name: str = 'Flange'):
+        new_motion_cart_pose = MotionCartPose(tool_name)
         new_motion_cart_pose.cart_point = np.array(
             (robot_pose.x, robot_pose.y, robot_pose.z)
         )*1e-3
@@ -38,8 +40,8 @@ class MotionCartPose:
         return new_motion_cart_pose
     
     @staticmethod
-    def from_array(robot_pose: np.ndarray, robot_orient: np.ndarray = None):
-        new_motion_cart_pose = MotionCartPose()
+    def from_array(robot_pose: np.ndarray, robot_orient: np.ndarray = None, tool_name: str = 'Flange'):
+        new_motion_cart_pose = MotionCartPose(tool_name= tool_name)
         new_motion_cart_pose.cart_point = robot_pose
         new_motion_cart_pose.cart_orient = robot_orient
         return new_motion_cart_pose
@@ -52,6 +54,10 @@ class MotionCartPose:
     def cart_orient(self):
         return self.__cart_orient
 
+    @property
+    def tool_name(self):
+        return self.__tool_name
+
     @cart_point.setter
     def cart_point(self, cart_point: np.array):
         self.__cart_point = cart_point
@@ -60,15 +66,22 @@ class MotionCartPose:
     @cart_orient.setter
     def cart_orient(self, cart_oriet: np.array):
         self.__cart_orient = cart_oriet
-    
 
-class RobotControl:
-    def __init__(self, gripper_port: str):
-        self.__gripper_port = gripper_port
+class Command(ABC):
     
-    def toggle_gripper(self, signal = False):
-        set_do(self.__gripper_port, signal)
+    @abstractmethod
+    def command_func(self):
+        pass
     
-    @property
-    def pose(self):
-        return MotionCartPose.from_robot_type(get_cartesian_position())
+    def execute(self):
+        self.command_func()
+
+class GripperCommand(Command):
+    def __init__(self, signal_name: str, cmd = False):
+        self.__cmd = cmd
+        self.__signal_name = signal_name
+        self.__func = set_do
+        Command.__init__(self)
+
+    def command_func(self):
+       self.__func(self.__signal_name, self.__cmd)

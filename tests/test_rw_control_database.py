@@ -10,8 +10,6 @@ KERN_1 = 7681
 # 7697 - id for kern 2
 KERN_2 = 7697
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 class testUtils(unittest.TestCase):
     def setUp(self):
         self.__db_ctrl = KernDBControl('tests/hackaton.db')
