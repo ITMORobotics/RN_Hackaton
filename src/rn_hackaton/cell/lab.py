@@ -1,22 +1,12 @@
 import copy
 import numpy as np
 import time
-from rn_hackaton.robot.robot_ctrl import MotionCartPose
 from rn_hackaton.db_control.rw_control_database import KernDBControl
 
-
-from rn_hackaton.qr_handler.simple_cam_detector import SimpleQRDetector as QRDetector
-# from rn_hackaton.qr_handler.pylon_detector import PylonQRDetector as QRDetector
 
 class Cell:
     def __init__(self,  db_path: str, positions_map = {}):
         self.__db_ctrl = KernDBControl(db_path)
-
-    def get_pose(self, name: str) -> MotionCartPose:
-        return self.__positions_map[name]
-    
-    def set_pose(self, name: str, position: MotionCartPose):
-        self.__positions_map[name] = position
 
     @property
     def mass(self) -> float:

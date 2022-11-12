@@ -7,9 +7,8 @@ from PIL import Image
 
 from rn_hackaton.robot.robot_ctrl import Command, MotionCartPose, GripperCommand
 
-
-class LinePTPCommand(Command):
-    def __init__(self, func_pointer, cart_position: MotionCartPose, speed = 100.0, accel = 1000.0, smooth = 0.0):
+class CartPTPCommand(Command):
+    def __init__(self, func_pointer, cart_position: MotionCartPose, speed = 100, accel = 1000, smooth = 0.0):
         self.__func = func_pointer
 
         self.__cart_position  = cart_position
@@ -30,11 +29,11 @@ class LinePTPCommand(Command):
 ALONG_Z_ORIENT = np.array((0.0, -np.pi/2, -np.pi))
 MAX_SPEED = 100
 
-SIMPLE_COMMAND0 = GripperCommand("Signal", False)
-SIMPLE_COMMAND1 = LinePTPCommand(line, MotionCartPose.from_array(np.array((0.7, -0.14, 0.65)), np.array((np.pi, 0.0, 0.0))))
-SIMPLE_COMMAND2 = LinePTPCommand(line, MotionCartPose.from_array(np.array((0.7, -0.14, 0.55))))
-SIMPLE_COMMAND3 = GripperCommand("Signal", True)
-SIMPLE_COMMAND4 = LinePTPCommand(line, MotionCartPose.from_array(np.array((0.7, -0.14, 0.65))))
+SIMPLE_COMMAND0 = GripperCommand("grab", False)
+SIMPLE_COMMAND1 = CartPTPCommand(line, MotionCartPose.from_array(np.array((0.7, -0.14, 0.65)), np.array((np.pi, 0.0, 0.0))))
+SIMPLE_COMMAND2 = CartPTPCommand(line, MotionCartPose.from_array(np.array((0.7, -0.14, 0.55))))
+SIMPLE_COMMAND3 = GripperCommand("grab", True)
+SIMPLE_COMMAND4 = CartPTPCommand(line, MotionCartPose.from_array(np.array((0.7, -0.14, 0.65))))
 
 def execute_commands(cmd_list: list):
     for c in cmd_list:
