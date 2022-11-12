@@ -65,7 +65,8 @@ class Cell:
     
     def get_index(self, kern_id: int):
         check_data = self.__db_ctrl.read_kern_table_by_id(kern_id)
-        print(check_data)
+        if check_data is None:
+            raise RuntimeError('Unknown id or problem with db')
         return (check_data[7], check_data[8])
 
     @property

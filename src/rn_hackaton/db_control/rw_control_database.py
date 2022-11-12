@@ -57,16 +57,11 @@ class KernDBControl:
         return None
 
     def read_kern_table_by_id(self, id: int) -> tuple:
-        try:
-            cur = self.__connection.cursor()
-            cur.execute("SELECT * FROM kern WHERE id=?", (id,))
-            row = cur.fetchone()
-            return row
-
-        except sqlite3.Error as error:
-            print("Failed to read data from table: KERN", error)
-        
-        return None
+        # try:
+        cur = self.__connection.cursor()
+        cur.execute("SELECT * FROM kern WHERE id=?", (id,))
+        row = cur.fetchone()
+        return row
 
     def __del__(self):
             self.__connection.close()
