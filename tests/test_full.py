@@ -87,6 +87,7 @@ def stage_2_get_container_from_stelazh(container_pose: np.ndarray):
         CartPTPCommand(line, MotionCartPose.from_array(container_pose + np.array((0.0, -0.20, 0.1)), CATCH_ORIENT, tool_name = 'ggrip')), # take up catch container
     ]
     execute_commands(GET_CONTAINER_FROM_STELAGE)
+    return copy.copy(GET_CONTAINER_FROM_STELAGE)
 
 def stage_3_put_container_on_scale():
     print("Stage 3")
@@ -98,6 +99,7 @@ def stage_3_put_container_on_scale():
         CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.53, 0.49428)), CATCH_ORIENT, tool_name = 'ggrip')) # step4_container left_up
     ]
     execute_commands(MOVE_CONTAINER_WITHOUT_KERN)
+    return copy.copy(MOVE_CONTAINER_WITHOUT_KERN)
 
 def stage_4_put_kern_on_scale():
     print("Stage 4")
@@ -140,10 +142,12 @@ def main():
     print("Container pose", container_pose)
     # stage_1_move_to_qr()
     
-    stage_2_get_container_from_stelazh(container_pose)
-    stage_3_put_container_on_scale(cell)
+    stage_2_pattern = stage_2_get_container_from_stelazh(container_pose)
+    stage_3_pattern = stage_3_put_container_on_scale()
     stage_4_put_kern_on_scale()
     stage_5_make_photo(cell, qr_detector)
+    stage_6_get_container_from_scale(stage_3_pattern)
+    stage_7_put_container_in_stelazh(stage_2_pattern)
 
 
 if __name__ == "__main__":
