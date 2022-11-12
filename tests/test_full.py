@@ -24,6 +24,9 @@ CATCH_ORIENT = np.radians(np.array((156.8, 0.0, 0.0)))
 PHOTO_ORIENT = np.radians(np.array((-90.0, 0.0, 0.0)))
 DEFAULT_ORIENT = np.array((np.pi, 0.0, 0.0))
 
+LEFT_KERN_PLACE = np.array([0.59050,-0.24279, 0.38833])
+RIGTH_KERN_PLACE = np.array([0.59050,-0.2891, 0.38797])
+
 class CartPTPCommand(Command):
     def __init__(self, func_pointer, cart_position: MotionCartPose, speed = 200, accel = 1500, smooth = 0.0):
         self.__func = func_pointer
@@ -50,8 +53,6 @@ def execute_commands(cmd_list: list):
 def stage_1_move_to_qr(cell: Cell, qr_detector: QRDetector):
     print("Stage 1")
     global KERN_ID
-    LEFT_KERN_PLACE = np.array([0.59050,-0.24279, 0.38833])
-    RIGTH_KERN_PLACE = np.array([0.59050,-0.2891, 0.38797])
 
     MOVE_TO_LEFT_QR = CartPTPCommand(line, MotionCartPose.from_array(LEFT_KERN_PLACE[:3], LEFT_KERN_PLACE[3:], tool_name = 'ggrip'))
     MOVE_TO_RIGTH_QR = CartPTPCommand(line, MotionCartPose.from_array(RIGTH_KERN_PLACE[:3], RIGTH_KERN_PLACE[3:], tool_name = 'ggrip'))
@@ -121,6 +122,12 @@ def stage_5_make_photo(cell: Cell, qr_detector: QRDetector):
     cell.save_front_photo(img_front)
     cell.save_left_photo(img_left)
     cell.save_in_db()
+
+def stage_6_get_container_from_scale():
+    pass
+
+def stage_7_put_container_in_strelazh():
+    pass
 
 def main():
     cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
