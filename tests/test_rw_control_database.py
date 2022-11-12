@@ -35,7 +35,7 @@ class testUtils(unittest.TestCase):
 
     
 def main():
-    __db_ctrl = KernDBControl('hackt.db')
+    __db_ctrl = KernDBControl('hackaton.db')
 
     data = __db_ctrl.read_kern_table_by_id(KERN_1)
     print(data)

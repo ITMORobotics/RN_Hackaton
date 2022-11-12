@@ -10,7 +10,7 @@ CALIBRATE_STELAZH = (
     np.array((0.89301, 0.19039, 0.54397))
 )
 def main():
-    cell = Cell('hackt.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
+    cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
     qr_detector = QRDetector()
     cell.save_id(5555)
     cell.save_mass()

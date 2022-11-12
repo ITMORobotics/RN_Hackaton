@@ -14,7 +14,7 @@ class Stelazh:
         self.addr = np.array([  [[0,0,0],[1,0,0],[2,0,0]],
                                 [[0,0,-1],[1,0,-1],[2,0,-1]],
                                 [[0,0,-2],[1,0,-2],[2,0,-2]]])
-        self.KK = np.diag([110,0,86])
+        self.KK = np.diag([0.110,0,0.086])
         self.left_up_point = np.array([0]*3)
         self.kx = 1
         self.ky = 1
@@ -43,7 +43,7 @@ class Stelazh:
 class Cell:
     def __init__(self,  db_path: str, serial_port: str, calibrate_points: list):
         self.__db_ctrl = KernDBControl(db_path)
-        self.__serial = SerialReader(serial_port)
+        # self.__serial = SerialReader(serial_port)
         self.__stelazh = Stelazh()
         self.__stelazh.calibrate(*calibrate_points)
         self.__data_row = [7681, -1, 0, 0]
