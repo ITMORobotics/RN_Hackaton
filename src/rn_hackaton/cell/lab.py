@@ -43,7 +43,11 @@ class Stelazh:
 class Cell:
     def __init__(self,  db_path: str, serial_port: str, calibrate_points: list):
         self.__db_ctrl = KernDBControl(db_path)
-        # self.__serial = SerialReader(serial_port)
+
+        self.__serial = None
+        if not serial_port is None:
+            self.__serial = SerialReader(serial_port)
+
         self.__stelazh = Stelazh()
         self.__stelazh.calibrate(*calibrate_points)
         self.__data_row = [7681, -1, 0, 0]
@@ -52,7 +56,6 @@ class Cell:
         self.__data_row[0] = id
     
     def save_mass(self):
-        print(self.mass)
         self.__data_row[1] = self.mass
     
     def save_front_photo(self, front_photo: Image):
@@ -76,6 +79,8 @@ class Cell:
 
     @property
     def mass(self) -> float:
+        if self.__serial is None:
+            return 52.02
         mass = self.__serial.get_scale()
         return mass
 

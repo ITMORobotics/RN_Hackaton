@@ -31,12 +31,9 @@ class KernDBControl:
         data_tuple = (id, mass, front_photo_bin, left_photo_bin)
         cursor.execute(sqlite_insert_blob_query, data_tuple)
         self.__connection.commit()
-        print("New kern data succefully added")
+        print("New kern data succefully added", data_tuple)
         cursor.close()
         return True
-
-
-        return False
     
     def read_last_analize_data(self, kern_id: int):
         cur = self.__connection.cursor()
