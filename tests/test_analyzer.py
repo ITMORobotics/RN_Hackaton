@@ -5,7 +5,6 @@ from rn_hackaton.stend.analyzer import SerialReader
 def main():
     ser = SerialReader('COM4')
     try:
-        ser.start_thread()
         time.sleep(1)
         while True:
             print('-'*50)

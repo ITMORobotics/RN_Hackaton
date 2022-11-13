@@ -71,7 +71,7 @@ class Cell:
         check_data = self.__db_ctrl.read_kern_table_by_id(kern_id)
         if check_data is None:
             raise RuntimeError('Unknown id or problem with db')
-        return (check_data[7], check_data[8])
+        return (check_data[7]-1, check_data[8]-1)
 
     @property
     def stelazh(self) -> Stelazh:
@@ -87,10 +87,11 @@ class Cell:
     @property
     def kern_plate_state(self) -> tuple:
         kern_plate_state = self.__serial.get_IRS()
+        time.sleep(0.1)
         return kern_plate_state
     
     @property
     def busy_kern_index(self) -> int:
         if 1 in self.kern_plate_state:
             return self.kern_plate_state.index(1)
-        return None
+        return 1

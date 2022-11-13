@@ -15,6 +15,7 @@ class SerialReader:
         self.update_thread.setDaemon(True)
         self.start_thread()
         # Should sleep
+        time.sleep(9.0)
 
     
     def get_IRS(self, index = None):
@@ -23,8 +24,8 @@ class SerialReader:
         return self.IRS[index]
 
     def get_scale(self):
-        while self.scale is None:
-            time.sleep(0.1)
+        if self.scale is None:
+            return 52.01
         return self.scale  
 
     def start_thread(self):
