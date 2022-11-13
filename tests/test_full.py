@@ -22,6 +22,7 @@ CLOSE_GRIPPER = GripperCommand("grab", True)
 CATCH_ORIENT = np.radians(np.array((156.8, 0.0, 0.0)))
 PHOTO_ORIENT = np.radians(np.array((-90.0, 0.0, 0.0)))
 DEFAULT_ORIENT = np.array((np.pi, 0.0, 0.0))
+TAKE_ORIENT = np.radians(np.array((180, 0.0, -90)))
 
 LEFT_KERN_PLACE = np.array([0.59050,-0.24279, 0.38833])
 RIGTH_KERN_PLACE = np.array([0.59050,-0.2891, 0.38797])
@@ -124,13 +125,13 @@ def stage_4_put_kern_on_scale():
         CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.0, 0.05 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # step down before kern
         CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.0, -0.05 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # push kern
         OPEN_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.0, -0.05 ,-0.13)), DEFAULT_ORIENT, tool_name = 'ggrip')), # take kern
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.0, -0.05 ,-0.13)), TAKE_ORIENT, tool_name = 'ggrip')), # take kern
         CLOSE_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.0, -0.05 ,0.0)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go up
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go to scale
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)) + np.array((0.0, 0.0 ,-0.1)), DEFAULT_ORIENT, tool_name = 'ggrip')), # go down to put it
+        CartPTPCommand(line, MotionCartPose.from_array(KERN_PLACE + np.array((0.0, -0.05 ,0.0)), TAKE_ORIENT, tool_name = 'ggrip')), # go up
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), TAKE_ORIENT, tool_name = 'ggrip')), # go to scale
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)) + np.array((0.0, 0.0 ,-0.1)), TAKE_ORIENT, tool_name = 'ggrip')), # go down to put it
         OPEN_GRIPPER,
-        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), DEFAULT_ORIENT, tool_name = 'ggrip')), # finish stage 4
+        CartPTPCommand(line, MotionCartPose.from_array(np.array((0.75188, -0.475, 0.49428)), TAKE_ORIENT, tool_name = 'ggrip')), # finish stage 4
     ] 
     execute_commands(PUT_KERN_ON_SCALE)
 
