@@ -161,14 +161,14 @@ def stage_7_put_container_in_stelazh(container_pose: np.ndarray):
     execute_commands(PUT_CONTAINER_IN_STELAZH)
 
 def main():
-    cell = Cell('hackaton.db', None, calibrate_points = CALIBRATE_STELAZH)
+    cell = Cell('hackaton.db', 'COM4', calibrate_points = CALIBRATE_STELAZH)
     qr_detector = QRDetector()
     index = cell.get_index(KERN_ID)
     print("Container index", index)
     container_pose = cell.stelazh[index[0], index[1]]
 
     print("Container pose", container_pose)
-    # stage_1_move_to_qr()
+    stage_1_move_to_qr(cell, qr_detector)
     
     stage_2_get_container_from_stelazh(container_pose)
     stage_3_put_container_on_scale()
